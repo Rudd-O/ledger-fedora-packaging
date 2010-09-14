@@ -1,6 +1,6 @@
 Name:           ledger
 Version:        2.6.3
-Release:        3%{?dist}
+Release:        3%{?dist}.1
 Summary:        A powerful command-line double-entry accounting system
 Group:          Applications/Productivity
 License:        BSD
@@ -31,7 +31,7 @@ Development files for the ledger library libamounts.
 Summary: Emacs mode for %{name}
 Group: Applications/Editors
 Requires: %{name} = %{version}-%{release}
-Requires: emacs(bin) >= %{_emacs_version}
+Requires: emacs >= %{_emacs_version}
 %description -n emacs-%{name}
 Emacs mode for %{name}.
 
