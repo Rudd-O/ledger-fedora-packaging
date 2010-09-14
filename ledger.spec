@@ -8,7 +8,7 @@ URL:            http://www.newartisans.com/software/ledger.html
 Source0:        http://ftp.newartisans.com/pub/ledger/%{name}-%{version}.tar.gz
 Source1:        ledger.1
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  gmp-devel, pcre-devel, expat-devel, libofx-devel, emacs(bin), texinfo
+BuildRequires:  gmp-devel, pcre-devel, expat-devel, libofx-devel, emacs, texinfo
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires(post):  info
