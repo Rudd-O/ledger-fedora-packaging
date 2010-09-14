@@ -1,6 +1,6 @@
 Name:           ledger
 Version:        2.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A powerful command-line double-entry accounting system
 Group:          Applications/Productivity
 License:        BSD
@@ -29,6 +29,7 @@ Development files for the ledger library libamounts.
 
 %package -n emacs-%{name}
 Summary: Emacs mode for %{name}
+Group: Applications/Editors
 Requires: %{name} = %{version}-%{release}
 Requires: emacs(bin) >= %{_emacs_version}
 %description -n emacs-%{name}
@@ -36,6 +37,7 @@ Emacs mode for %{name}.
 
 %package -n emacs-%{name}-el
 Summary: Emacs elisp source for %{name}
+Group: Applications/Editors
 BuildArch: noarch
 Requires: %{name} = %{version}-%{release}
 Requires: emacs-%{name} = %{version}-%{release}
@@ -97,6 +99,9 @@ fi
 %{_libdir}/lib*.a
 
 %changelog
+* Mon Sep 13 2010 Jim Radford <radford@blackbean.org> - 2.6.3-3
+- Add a Group to the emacs packages
+
 * Tue Jul  6 2010 Jim Radford <radford@blackbean.org> - 2.6.3-2
 - Only support emacs until someone tests xemacs
 
