@@ -1,3 +1,4 @@
+%define _emacs_sitelispdir %{_datadir}/emacs/site-lisp
 Name:           ledger
 Version:        2.6.3
 Release:        3%{?dist}.1
@@ -31,7 +32,7 @@ Development files for the ledger library libamounts.
 Summary: Emacs mode for %{name}
 Group: Applications/Editors
 Requires: %{name} = %{version}-%{release}
-Requires: emacs >= %{_emacs_version}
+Requires: emacs-common >= %{_emacs_version}
 %description -n emacs-%{name}
 Emacs mode for %{name}.
 
