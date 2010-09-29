@@ -1,6 +1,6 @@
 Name:           ledger
 Version:        2.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A powerful command-line double-entry accounting system
 Group:          Applications/Productivity
 License:        BSD
@@ -97,6 +97,9 @@ fi
 %{_libdir}/lib*.a
 
 %changelog
+* Wed Sep 29 2010 jkeating - 2.6.3-3
+- Rebuilt for gcc bug 634757
+
 * Tue Jul  6 2010 Jim Radford <radford@blackbean.org> - 2.6.3-2
 - Only support emacs until someone tests xemacs
 
