@@ -1,6 +1,6 @@
 Name:           ledger
 Version:        2.6.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A powerful command-line double-entry accounting system
 Group:          Applications/Productivity
 License:        BSD
@@ -97,6 +97,9 @@ fi
 %{_libdir}/lib*.a
 
 %changelog
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.6.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Wed Sep 29 2010 jkeating - 2.6.3-3
 - Rebuilt for gcc bug 634757
 
