@@ -1,6 +1,6 @@
 Name:           ledger
 Version:        2.6.3
-Release:        4%{?dist}.2
+Release:        5%{?dist}.2
 Summary:        A powerful command-line double-entry accounting system
 Group:          Applications/Productivity
 License:        BSD
@@ -97,6 +97,9 @@ fi
 %{_libdir}/lib*.a
 
 %changelog
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.6.3-5.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Fri Oct 21 2011 Marcela Mašláňová <mmaslano@redhat.com> - 2.6.3-4.2
 - rebuild with new gmp without compat lib
 
