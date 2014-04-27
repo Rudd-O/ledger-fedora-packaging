@@ -1,17 +1,41 @@
-Name:           ledger
-Version:        2.6.3
-Release:        9%{?dist}.2
-Summary:        A powerful command-line double-entry accounting system
-Group:          Applications/Productivity
-License:        BSD
-URL:            http://ledger-cli.org/
-Source0:        http://ftp.newartisans.com/pub/ledger/%{name}-%{version}.tar.gz
-Source1:        ledger.1
-BuildRequires:  gmp-devel, pcre-devel, expat-devel, libofx-devel, emacs(bin), texinfo
-Requires(post): /sbin/ldconfig
+%global commit 7be70aab59051aa358547a3e530cc95490c04232
+
+Name:             ledger
+Version:          3.0.2
+Release:          1%{?dist}
+Summary:          A powerful command-line double-entry accounting system
+Group:            Applications/Productivity
+License:          BSD
+URL:              http://ledger-cli.org/
+Source0:          https://github.com/ledger/ledger/archive/%{commit}/%{name}-%{version}.tar.gz
+
+# This requires boost 1.55 which is not yet available for Fedora.
+Patch0:           %{name}-3.0.2-Revert-Require-the-use-of-C-11.patch
+
+BuildRequires:    boost-devel
+BuildRequires:    cmake
+BuildRequires:    emacs(bin)
+BuildRequires:    gettext-devel
+BuildRequires:    gmp-devel
+BuildRequires:    libedit-devel
+BuildRequires:    mpfr-devel
+BuildRequires:    python
+BuildRequires:    utf8cpp-devel
+
+# For building documentation.
+BuildRequires:    doxygen
+BuildRequires:    graphviz
+BuildRequires:    man2html
+BuildRequires:    texinfo
+BuildRequires:    texlive-cm-super
+BuildRequires:    texlive-ec
+BuildRequires:    texlive-eurosym
+BuildRequires:    texinfo-tex
+
+Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires(post):  info
-Requires(preun): info
+Requires(post):   info
+Requires(preun):  info
 
 %description
 Ledger is a powerful, double-entry accounting system that is accessed
@@ -24,7 +48,7 @@ Summary: Libraries and header files for %{name} development
 Group:   Development/Libraries
 Requires: %{name} = %{version}-%{release}
 %description devel
-Development files for the ledger library libamounts.
+Development files for the ledger library libledger.
 
 %package -n emacs-%{name}
 Summary: Emacs mode for %{name}
@@ -43,52 +67,95 @@ This package contains the elisp source files for using %{name} under
 emacs. You do not need to install this package; use
 emacs-%{name} instead.
 
+
 %prep
-%setup -q
-iconv -f iso-8859-1 -t utf-8 ledger.texi > _ledger.texi
-sed -e 's/@documentencoding iso-8859-1/@documentencoding utf-8/' _ledger.texi > ledger.texi
-chmod -x scripts/*
+%setup -q -n %{name}-%{commit}
+%patch0 -p1
+
 
 %build
-%configure
+./acprep --prefix=%{_prefix} update
+%cmake . \
+    -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+    -DBUILD_WEB_DOCS=1 \
+    -DBUILD_EMACSLISP:BOOL=ON \
+    -DCMAKE_SKIP_RPATH:BOOL=ON
 make %{?_smp_mflags}
+make doc
+
+# Build info files.
+pushd doc
+makeinfo ledger3.texi
+makeinfo ledger-mode.texi
+popd
+
 
 %install
 make install DESTDIR=%{buildroot}
-rm %{buildroot}%{_infodir}/dir
-rm %{buildroot}%{_libdir}/*.la
 
-install -v -m 644 -D %{SOURCE1} %{buildroot}/%{_mandir}/man1/%{name}.1
+# Install documentation manually
+rm -rf %{buildroot}%{_docdir}
+rm -rf %{buildroot}%{_infodir}/*
+
+cp -p doc/ledger3.info* %{buildroot}%{_infodir}
+cp -p doc/ledger-mode.info %{buildroot}%{_infodir}
+
+
+%check
+# Tests all fail when removing rpath.
+# make check
 
 
 %postun -p /sbin/ldconfig
 %post
-ldconfig
-install-info %{_infodir}/%{name}.info %{_infodir}/dir || :
+/sbin/ldconfig
+install-info %{_infodir}/ledger3.info %{_infodir}/dir || :
+install-info %{_infodir}/ledger-mode.info %{_infodir}/dir || :
 %preun
 if [ $1 = 0 ]; then
-  install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir || :
+  install-info --delete %{_infodir}/ledger3.info %{_infodir}/dir || :
+  install-info --delete %{_infodir}/ledger-mode.info %{_infodir}/dir || :
 fi
 
+
 %files
-%doc LICENSE NEWS README TODO sample.dat scripts/
-%{_bindir}/*
-%{_infodir}/%{name}*
-%{_libdir}/lib*.so.*
-%{_mandir}/man*/*
+%doc README.md
+%doc doc/GLOSSARY.md doc/LICENSE doc/NEWS
+%doc doc/ledger3.html doc/ledger-mode.html
+%doc doc/ledger3.pdf  doc/ledger-mode.pdf
+%doc test/input/drewr3.dat test/input/drewr.dat test/input/sample.dat
+%{_bindir}/ledger
+%{_infodir}/ledger3.info*
+%{_infodir}/ledger-mode.info*
+%{_libdir}/libledger.so.3
+%{_mandir}/man1/ledger.1*
 
 %files -n emacs-%{name}
-%{_emacs_sitelispdir}/*.elc
+%dir %{_emacs_sitelispdir}/ledger-mode
+%{_emacs_sitelispdir}/ledger-mode/*.elc
 
 %files -n emacs-%{name}-el
-%{_emacs_sitelispdir}/*.el
+%dir %{_emacs_sitelispdir}/ledger-mode
+%{_emacs_sitelispdir}/ledger-mode/*.el
 
 %files devel
-%{_includedir}/%{name}
-%{_libdir}/lib*.so
-%{_libdir}/lib*.a
+%{_includedir}/ledger
+%{_libdir}/libledger.so
+
 
 %changelog
+* Sun Apr 27 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.0.2-1
+- update to upstream release 3.0.2
+- remove EL6 related macros
+- update URL
+- use specific commit hash to obtain sources from GitHub
+- update BuildRequires and build using CMake
+- build HTML/PDF documentation
+- revert a patch from upstream that requires boost 1.55 (not yet available
+  on Fedora)
+- libamounts now known as libledger
+- use man page that is now built by upstream
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.6.3-9.2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
