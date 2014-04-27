@@ -7,7 +7,6 @@ License:        BSD
 URL:            http://ledger-cli.org/
 Source0:        http://ftp.newartisans.com/pub/ledger/%{name}-%{version}.tar.gz
 Source1:        ledger.1
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  gmp-devel, pcre-devel, expat-devel, libofx-devel, emacs(bin), texinfo
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -55,15 +54,12 @@ chmod -x scripts/*
 make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 rm %{buildroot}%{_infodir}/dir
 rm %{buildroot}%{_libdir}/*.la
 
 install -v -m 644 -D %{SOURCE1} %{buildroot}/%{_mandir}/man1/%{name}.1
 
-%clean
-rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 %post
@@ -75,7 +71,6 @@ if [ $1 = 0 ]; then
 fi
 
 %files
-%defattr(-,root,root,-)
 %doc LICENSE NEWS README TODO sample.dat scripts/
 %{_bindir}/*
 %{_infodir}/%{name}*
@@ -83,15 +78,12 @@ fi
 %{_mandir}/man*/*
 
 %files -n emacs-%{name}
-%defattr(-,root,root,-)
 %{_emacs_sitelispdir}/*.elc
 
 %files -n emacs-%{name}-el
-%defattr(-,root,root,-)
 %{_emacs_sitelispdir}/*.el
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/%{name}
 %{_libdir}/lib*.so
 %{_libdir}/lib*.a
