@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.0.2
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
@@ -108,12 +108,34 @@ popd
 %install
 make install DESTDIR=%{buildroot}
 
+# Bash completion
+mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
+install -p -m0644 contrib/ledger-completion.bash \
+    %{buildroot}%{_sysconfdir}/bash_completion.d/ledger
+
 # Install documentation manually
 rm -rf %{buildroot}%{_docdir}
 rm -rf %{buildroot}%{_infodir}/*
 
+# Info files
 cp -p doc/ledger3.info* %{buildroot}%{_infodir}
 cp -p doc/ledger-mode.info %{buildroot}%{_infodir}
+
+# Contrib scripts
+mkdir -p %{buildroot}%{_docdir}/ledger/contrib
+for i in bal bal-huquq entry getquote.pl getquote-uk.py ledger-du README repl.sh report tc ti to trend; do
+    install -p -m0644 contrib/${i} %{buildroot}%{_docdir}/ledger/contrib/${i}
+done
+
+# Python example
+mkdir -p %{buildroot}%{_docdir}/ledger/python
+install -p -m0644 python/demo.py %{buildroot}%{_docdir}/ledger/python/demo.py
+
+# Input samples
+mkdir -p %{buildroot}%{_docdir}/ledger/samples
+for i in demo.ledger drewr3.dat drewr.dat sample.dat wow.dat; do
+    install -p -m0644 test/input/${i} %{buildroot}%{_docdir}/ledger/samples/${i}
+done
 
 
 %check
@@ -138,12 +160,12 @@ fi
 %doc doc/GLOSSARY.md doc/LICENSE doc/NEWS
 %doc doc/ledger3.html doc/ledger-mode.html
 %doc doc/ledger3.pdf  doc/ledger-mode.pdf
-%doc test/input/drewr3.dat test/input/drewr.dat test/input/sample.dat
 %{_bindir}/ledger
 %{_infodir}/ledger3.info*
 %{_infodir}/ledger-mode.info*
 %{_libdir}/libledger.so.3
 %{_mandir}/man1/ledger.1*
+%config(noreplace) %{_sysconfdir}/bash_completion.d/ledger
 
 %files -n emacs-%{name}
 %dir %{_emacs_sitelispdir}/ledger-mode
@@ -162,6 +184,12 @@ fi
 
 
 %changelog
+* Sun May 04 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.0.2-5
+- include useful scripts from contrib/
+- include more sample files
+- include example python script (demo.py)
+- add bash completion
+
 * Sun May 04 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.0.2-4
 - add ledger-python subpackage with Python bindings
 - remove BR: doxygen for now (until jQuery is packaged)
