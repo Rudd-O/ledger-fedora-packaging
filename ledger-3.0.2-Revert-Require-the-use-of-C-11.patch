@@ -1,0 +1,159 @@
+From 1f0cc39fe64afad36feec8e1968006774f7b98e3 Mon Sep 17 00:00:00 2001
+From: Jamie Nguyen <j@jamielinux.com>
+Date: Sun, 27 Apr 2014 10:26:26 +0100
+Subject: [PATCH] Revert "Require the use of C++11"
+
+This reverts commit 7be70aab59051aa358547a3e530cc95490c04232.
+---
+ CMakeLists.txt   | 33 +++++++++++++++++++++++++++++++--
+ default.nix      | 23 +++++++----------------
+ src/journal.cc   |  5 +++--
+ src/system.hh.in |  2 ++
+ src/utils.h      |  4 ++++
+ 5 files changed, 47 insertions(+), 20 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b728974..0f53887 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,8 +9,6 @@ set(Ledger_VERSION_DATE  20140417)
+ 
+ enable_testing()
+ 
+-add_definitions(-std=c++11)
+-
+ ########################################################################
+ 
+ option(USE_PYTHON "Build support for the Python scripting bridge" OFF)
+@@ -150,6 +148,37 @@ endif()
+ 
+ cmake_pop_check_state()
+ 
++#cmake_push_check_state()
++#
++#set(CMAKE_REQUIRED_FLAGS -std=c++11)
++#set(CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH})
++#
++#check_cxx_source_runs("
++##include <regex>
++##include <vector>
++##include <iostream>
++#
++#int main() {
++#  std::vector<int> x {0, 1, 2, 3, 4};
++#  for (auto i : x)
++#    std::cout << i << std::endl;
++#
++#  std::regex r(\"foo\");
++#  std::cout << std::regex_match(\"foobar\", r) << std::endl;
++#  return 0;
++#}" CXX11_RUNS)
++#
++#cmake_pop_check_state()
++#
++#if(CXX11_RUNS)
++#  set(HAVE_CXX11 1)
++#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++#else()
++  set(HAVE_CXX11 0)
++#endif()
++#
++#cmake_pop_check_state()
++
+ ########################################################################
+ 
+ include_directories(${CMAKE_INCLUDE_PATH})
+diff --git a/default.nix b/default.nix
+index f1745ce..7a822bb 100644
+--- a/default.nix
++++ b/default.nix
+@@ -1,26 +1,17 @@
+-{ stdenv, fetchgit, cmake, boost, gmp, mpfr, libedit, python
+-, texinfo, gnused }:
+-
+-let
+-  rev = "20140417";
+-in
++{ stdenv, fetchgit, cmake, ninja, boost, gmp, mpfr, libedit, python, texinfo }:
+ 
+ stdenv.mkDerivation {
+-  name = "ledger-3.0.2.${rev}";
++  name = "ledger-3.0.2";
++  version = "3.0.2";
+ 
+   src = ./.;
+ 
+-  buildInputs = [ cmake boost gmp mpfr libedit python texinfo gnused ];
++  buildInputs = [ cmake ninja boost gmp mpfr libedit python texinfo ];
+ 
++  # Tests on Darwin are failing
++  doCheck = !stdenv.isDarwin;
+   enableParallelBuilding = true;
+ 
+-  # Skip byte-compiling of emacs-lisp files because this is currently
+-  # broken in ledger...
+-  postInstall = ''
+-    mkdir -p $out/share/emacs/site-lisp/
+-    cp -v $src/lisp/*.el $out/share/emacs/site-lisp/
+-  '';
+-
+   meta = {
+     homepage = "http://ledger-cli.org/";
+     description = "A double-entry accounting system with a command-line reporting interface";
+@@ -34,6 +25,6 @@ stdenv.mkDerivation {
+     '';
+ 
+     platforms = stdenv.lib.platforms.all;
+-    maintainers = with stdenv.lib.maintainers; [ simons the-kenny jwiegley ];
++    maintainers = with stdenv.lib.maintainers; [ simons the-kenny ];
+   };
+ }
+diff --git a/src/journal.cc b/src/journal.cc
+index 142b68a..1ce02a5 100644
+--- a/src/journal.cc
++++ b/src/journal.cc
+@@ -410,9 +410,10 @@ bool journal_t::add_xact(xact_t * xact)
+       foreach (post_t * post, xact->posts) {
+         account_t * acct = post->account;
+         if (acct->deferred_posts) {
+-          auto i = acct->deferred_posts->find(uuid);
++          deferred_posts_map_t::iterator
++            i = acct->deferred_posts->find(uuid);
+           if (i != acct->deferred_posts->end()) {
+-            for (post_t * rpost : (*i).second)
++            foreach (post_t * rpost, (*i).second)
+               if (acct == rpost->account)
+                 acct->add_post(rpost);
+             acct->deferred_posts->erase(i);
+diff --git a/src/system.hh.in b/src/system.hh.in
+index 8f50158..952411f 100644
+--- a/src/system.hh.in
++++ b/src/system.hh.in
+@@ -56,6 +56,8 @@
+ #define Ledger_VERSION_PATCH     @Ledger_VERSION_PATCH@
+ #define Ledger_VERSION_DATE      @Ledger_VERSION_DATE@
+ 
++#define HAVE_CXX11               @HAVE_CXX11@
++
+ #define HAVE_EDIT                @HAVE_EDIT@
+ #define HAVE_GETTEXT             @HAVE_GETTEXT@
+ 
+diff --git a/src/utils.h b/src/utils.h
+index c3dcf56..95cc64f 100644
+--- a/src/utils.h
++++ b/src/utils.h
+@@ -485,7 +485,11 @@ inline void check_for_signal() {
+ /*@{*/
+ 
+ #define foreach BOOST_FOREACH
++#if HAVE_CXX11
+ using std::unique_ptr;
++#else
++#define unique_ptr std::auto_ptr
++#endif
+ 
+ namespace ledger {
+ 
+-- 
+1.9.0
+
