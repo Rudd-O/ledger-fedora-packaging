@@ -1,0 +1,57 @@
+From 6c9f5fa7b2e5692dac43a5dad19a01196ea12055 Mon Sep 17 00:00:00 2001
+From: Jamie Nguyen <j@jamielinux.com>
+Date: Sun, 4 May 2014 11:31:51 +0100
+Subject: [PATCH] Revert "Improve an error message relating to balance
+ assertions"
+
+This reverts commit aa2ff2b5db4afd28fc05e4cb0848d6cc1f0862e9.
+---
+ src/textual.cc | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/src/textual.cc b/src/textual.cc
+index 55f22a2..d02e2f7 100644
+--- a/src/textual.cc
++++ b/src/textual.cc
+@@ -1609,25 +1609,22 @@ post_t * instance_t::parse_post(char *          line,
+             "line " << context.linenum << ": " << "post amount = " << amt);
+ 
+       amount_t diff = amt;
+-      amount_t tot;
+ 
+       switch (account_total.type()) {
+       case value_t::AMOUNT:
+-        tot = account_total.as_amount();
++        diff -= account_total.as_amount();
+         break;
+ 
+       case value_t::BALANCE:
+         if (optional<amount_t> comm_bal =
+             account_total.as_balance().commodity_amount(amt.commodity()))
+-          tot = *comm_bal;
++          diff -= *comm_bal;
+         break;
+ 
+       default:
+         break;
+       }
+ 
+-      diff -= tot;
+-
+       DEBUG("post.assign",
+             "line " << context.linenum << ": " << "diff = " << diff);
+       DEBUG("textual.parse", "line " << context.linenum << ": "
+@@ -1637,9 +1634,7 @@ post_t * instance_t::parse_post(char *          line,
+         if (! post->amount.is_null()) {
+           diff -= post->amount;
+           if (! no_assertions && ! diff.is_zero())
+-            throw_(parse_error,
+-                   _f("Balance assertion off by %1% (expected to see %2%)")
+-                   % diff % tot);
++            throw_(parse_error, _f("Balance assertion off by %1%") % diff);
+         } else {
+           post->amount = diff;
+           DEBUG("textual.parse", "line " << context.linenum << ": "
+-- 
+1.9.0
+

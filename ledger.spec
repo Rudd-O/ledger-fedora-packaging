@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.0.2
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
@@ -11,9 +11,11 @@ Source0:          https://github.com/ledger/ledger/archive/%{commit}/%{name}-%{v
 
 # This requires boost 1.55 which is not yet available for Fedora.
 Patch0:           %{name}-3.0.2-Revert-Require-the-use-of-C-11.patch
+# Revert aa2ff2b5 which caused a regression.
+Patch1:           %{name}-3.0.2-Revert-Improve-error-message-balance.patch
 # There are @node pointer errors in the documentation that result in a
 # navigation error.
-Patch1:           %{name}-3.0.2-Fix-node-pointer-errors.patch
+Patch2:           %{name}-3.0.2-Fix-node-pointer-errors.patch
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -75,6 +77,7 @@ emacs-%{name} instead.
 %setup -q -n %{name}-%{commit}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 
 %build
@@ -148,6 +151,9 @@ fi
 
 
 %changelog
+* Sun May 04 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.0.2-3
+- revert upstream commit aa2ff2b5 which caused a regression
+
 * Sun Apr 27 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.0.2-2
 - fix @node pointer errors in Info files resulting in broken navigation
 
