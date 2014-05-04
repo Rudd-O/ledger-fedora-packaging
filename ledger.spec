@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.0.2
-Release:          3%{?dist}
+Release:          4%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
@@ -24,11 +24,11 @@ BuildRequires:    gettext-devel
 BuildRequires:    gmp-devel
 BuildRequires:    libedit-devel
 BuildRequires:    mpfr-devel
-BuildRequires:    python
+BuildRequires:    python-devel
 BuildRequires:    utf8cpp-devel
 
 # For building documentation.
-BuildRequires:    doxygen
+#BuildRequires:    doxygen
 BuildRequires:    graphviz
 BuildRequires:    man2html
 BuildRequires:    texinfo
@@ -48,12 +48,19 @@ from the UNIX command-line. This may put off some users — as there is
 no flashy UI — but for those who want unparalleled reporting access to
 their data, there really is no alternative.
 
+%package python
+Summary: Python bindings for %{name}
+Group:   System Environment/Libraries
+Requires: %{name} = %{version}-%{release}
+%description python
+Python bindings for ledger.
+
 %package devel
 Summary: Libraries and header files for %{name} development
 Group:   Development/Libraries
 Requires: %{name} = %{version}-%{release}
 %description devel
-Development files for the ledger library libledger.
+Libraries and header files for %{name} development.
 
 %package -n emacs-%{name}
 Summary: Emacs mode for %{name}
@@ -86,7 +93,8 @@ emacs-%{name} instead.
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DBUILD_WEB_DOCS=1 \
     -DBUILD_EMACSLISP:BOOL=ON \
-    -DCMAKE_SKIP_RPATH:BOOL=ON
+    -DCMAKE_SKIP_RPATH:BOOL=ON \
+    -DUSE_PYTHON=ON
 make %{?_smp_mflags}
 make doc
 
@@ -145,12 +153,19 @@ fi
 %dir %{_emacs_sitelispdir}/ledger-mode
 %{_emacs_sitelispdir}/ledger-mode/*.el
 
+%files python
+%{python2_sitearch}/ledger.so
+
 %files devel
 %{_includedir}/ledger
 %{_libdir}/libledger.so
 
 
 %changelog
+* Sun May 04 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.0.2-4
+- add ledger-python subpackage with Python bindings
+- remove BR: doxygen for now (until jQuery is packaged)
+
 * Sun May 04 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.0.2-3
 - revert upstream commit aa2ff2b5 which caused a regression
 
