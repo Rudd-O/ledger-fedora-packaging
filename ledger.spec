@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.0.2
-Release:          7%{?dist}
+Release:          8%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
@@ -184,6 +184,9 @@ fi
 
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.0.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Fri May 23 2014 Petr Machata <pmachata@redhat.com> - 3.0.2-7
 - Rebuild for boost 1.55.0
 
