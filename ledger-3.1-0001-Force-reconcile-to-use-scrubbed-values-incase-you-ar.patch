@@ -1,0 +1,26 @@
+From a66001382cd68c1d989bbe4ced629cc87370a4ce Mon Sep 17 00:00:00 2001
+From: Craig Earls <enderw88@gmail.com>
+Date: Fri, 10 Oct 2014 22:02:44 -0700
+Subject: [PATCH 1/9] Force reconcile to use scrubbed values incase you are
+ reconciling an account with lot values.
+
+---
+ lisp/ledger-reconcile.el | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lisp/ledger-reconcile.el b/lisp/ledger-reconcile.el
+index f660fd0..a8dc1eb 100644
+--- a/lisp/ledger-reconcile.el
++++ b/lisp/ledger-reconcile.el
+@@ -118,7 +118,7 @@ ledger file order, use '(0)'."
+     ;; specify the individual fields in the command line.
+     (if (ledger-exec-ledger buffer (current-buffer)
+                             "balance" "--limit" "cleared or pending" "--empty" "--collapse"
+-                            "--format" "%(display_total)" account)
++                            "--format" "%(scrub(display_total))" account)
+         (ledger-split-commodity-string
+          (buffer-substring-no-properties (point-min) (point-max))))))
+ 
+-- 
+1.9.3
+

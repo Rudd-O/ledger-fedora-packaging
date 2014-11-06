@@ -1,21 +1,25 @@
-%global commit 7be70aab59051aa358547a3e530cc95490c04232
+%global commit 720c03b139d251c53f9deef491f5953e2fdb97ca
 
 Name:             ledger
-Version:          3.0.2
-Release:          10%{?dist}
+Version:          3.1
+Release:          1%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
 URL:              http://ledger-cli.org/
 Source0:          https://github.com/ledger/ledger/archive/%{commit}/%{name}-%{version}.tar.gz
 
-# This requires boost 1.55 which is not yet available for Fedora.
-Patch0:           %{name}-3.0.2-Revert-Require-the-use-of-C-11.patch
-# Revert aa2ff2b5 which caused a regression.
-Patch1:           %{name}-3.0.2-Revert-Improve-error-message-balance.patch
-# There are @node pointer errors in the documentation that result in a
-# navigation error.
-Patch2:           %{name}-3.0.2-Fix-node-pointer-errors.patch
+# A series of small commits from upstream that came shortly after the release
+# of version 3.1, including a fix for FTBFS when building the documentation.
+Patch1:           %{name}-3.1-0001-Force-reconcile-to-use-scrubbed-values-incase-you-ar.patch
+Patch2:           %{name}-3.1-0002-Fix-texinfo-syntax-errors.patch
+Patch3:           %{name}-3.1-0003-BUILD_WEB_DOCS-implies-BUILD_DOCS.patch
+Patch4:           %{name}-3.1-0004-make-columns-default-to-terminal-width-as-returned-b.patch
+Patch5:           %{name}-3.1-0005-Typo-fix.patch
+Patch6:           %{name}-3.1-0006-Fix-numbers-from-example.patch
+Patch7:           %{name}-3.1-0007-Update-ledger3.texi.patch
+Patch8:           %{name}-3.1-0008-Update-ledger3.texi.patch
+Patch9:           %{name}-3.1-0009-Some-minor-changes.patch
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -28,7 +32,7 @@ BuildRequires:    python-devel
 BuildRequires:    utf8cpp-devel
 
 # For building documentation.
-#BuildRequires:    doxygen
+BuildRequires:    doxygen
 BuildRequires:    graphviz
 BuildRequires:    man2html
 BuildRequires:    texinfo
@@ -82,9 +86,15 @@ emacs-%{name} instead.
 
 %prep
 %setup -q -n %{name}-%{commit}
-%patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
 
 
 %build
@@ -184,6 +194,9 @@ fi
 
 
 %changelog
+* Tue Nov 04 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.1-1
+- update to upstream release 3.1
+
 * Tue Aug 26 2014 David Tardon <dtardon@redhat.com> - 3.0.2-10
 - rebuild for ICU 53.1
 

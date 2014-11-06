@@ -1,0 +1,50 @@
+From acf0618fd0be3f951ac3376d3dd31330b2ea0cd6 Mon Sep 17 00:00:00 2001
+From: Martin Michlmayr <tbm@cyrius.com>
+Date: Sun, 12 Oct 2014 16:52:43 -0400
+Subject: [PATCH 2/9] Fix texinfo syntax errors
+
+Fix the following texinfo syntax errors:
+
+ledger/doc/ledger3.texi:7878: @itemx must follow @item
+ledger/doc/ledger3.texi:7939: @itemx must follow @item
+ledger/doc/ledger3.texi:7944: @itemx must follow @item
+---
+ doc/ledger3.texi | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/doc/ledger3.texi b/doc/ledger3.texi
+index c7613c0..c795a05 100644
+--- a/doc/ledger3.texi
++++ b/doc/ledger3.texi
+@@ -7875,11 +7875,10 @@ A regular expression that matches against a transaction's payee name.
+ @itemx tag(REGEX)
+ A regular expression that matches against a transaction's tags.
+ 
+-@itemx expr date =~ /REGEX/
++@item expr date =~ /REGEX/
+ Useful for specifying a date in plain terms.  For example, you could say
+ @samp{expr date =~ /2014/}.
+ 
+-
+ @item expr comment =~ /REGEX/
+ A regular expression that matches against a posting's comment field. This
+ searches only a posting's field, not the transaction's note or comment field.
+@@ -7935,13 +7934,12 @@ A sub-expression is nested in parenthesis.  This can be useful passing
+ more complicated arguments to functions, or for overriding the natural
+ precedence order of operators.
+ 
+-
+-@itemx expr base =~ /REGEX/
++@item expr base =~ /REGEX/
+ A regular expression that matches against an account's base name.  If
+ a posting, this will match against the account affected by the
+ posting.
+ 
+-@itemx expr code =~ /REGEX/
++@item expr code =~ /REGEX/
+ A regular expression that matches against the transaction code (the
+ text that occurs between parentheses before the payee).
+ 
+-- 
+1.9.3
+

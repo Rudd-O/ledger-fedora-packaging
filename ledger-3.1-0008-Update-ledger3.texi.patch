@@ -1,0 +1,33 @@
+From 5df0788ba20f3b9a8f37827b92d18c92f37827c6 Mon Sep 17 00:00:00 2001
+From: myqlarson <myqlarson@gmail.com>
+Date: Mon, 20 Oct 2014 02:01:18 +1300
+Subject: [PATCH 8/9] Update ledger3.texi
+
+Improved wording
+---
+ doc/ledger3.texi | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/doc/ledger3.texi b/doc/ledger3.texi
+index 8a9d52b..e9b0f55 100644
+--- a/doc/ledger3.texi
++++ b/doc/ledger3.texi
+@@ -4588,11 +4588,11 @@ from the file above.
+ @findex --account @var{STR}
+ @findex --rich-data
+ 
+-The @command{convert} command accepts three options. The most important
+-ones are @option{--invert} which inverts the amount field, and
++The @command{convert} command accepts three options. They are
++@option{--invert} which inverts the amount field,
+ @option{--account @var{STR}} which you can use to specify the account to
+-balance against and @option{--rich-data}. When using the rich-data
+-switch, additional metadata is stored as tags. There is, for example,
++balance against, and @option{--rich-data} which stores
++additional metadata as tags. There is, for example,
+ a UUID field. If an entry with the same UUID tag is already included in
+ the normal ledger file (specified via @option{--file @var{FILE} (-f)} or
+ via the environment variable @env{LEDGER_FILE}) this entry will not be
+-- 
+1.9.3
+

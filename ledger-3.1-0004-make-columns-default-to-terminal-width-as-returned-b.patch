@@ -1,0 +1,103 @@
+From 56976a127c081a6a008c81966360003a8711a319 Mon Sep 17 00:00:00 2001
+From: Stefano Zacchiroli <zack@upsilon.cc>
+Date: Mon, 13 Oct 2014 23:15:23 +0200
+Subject: [PATCH 4/9] make --columns default to terminal width, as returned by
+ ioctl()
+
+If set, the COLUMNS environment variable will take precedence over terminal
+width. However, please note that COLUMNS is usually *not* exported by shells to
+child processes, so in most cases COLUMNS will be undefined for ledger---hence
+the motivation for this change.
+
+Terminal width is queried using ioctl() on stdin. For the sake of portability
+the querying is done only on platform where ioctl() is detected as supported at
+compile-time.
+---
+ CMakeLists.txt   | 1 +
+ src/report.cc    | 7 +++++++
+ src/select.cc    | 7 +++++++
+ src/system.hh.in | 5 +++++
+ 4 files changed, 20 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6592f10..09d1405 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -87,6 +87,7 @@ check_function_exists(access HAVE_ACCESS)
+ check_function_exists(realpath HAVE_REALPATH)
+ check_function_exists(getpwuid HAVE_GETPWUID)
+ check_function_exists(getpwnam HAVE_GETPWNAM)
++check_function_exists(ioctl HAVE_IOCTL)
+ check_function_exists(isatty HAVE_ISATTY)
+ 
+ check_c_source_compiles("
+diff --git a/src/report.cc b/src/report.cc
+index 7bb79bd..a05a57d 100644
+--- a/src/report.cc
++++ b/src/report.cc
+@@ -181,10 +181,17 @@ void report_t::normalize_options(const string& verb)
+   }
+ 
+   long cols = 0;
++#if HAVE_IOCTL
++  struct winsize ws;
++#endif
+   if (HANDLED(columns_))
+     cols = lexical_cast<long>(HANDLER(columns_).value);
+   else if (const char * columns = std::getenv("COLUMNS"))
+     cols = lexical_cast<long>(columns);
++#if HAVE_IOCTL
++  else if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1)
++      cols = ws.ws_col;
++#endif
+   else
+     cols = 80L;
+ 
+diff --git a/src/select.cc b/src/select.cc
+index 45ae34b..a9e943a 100644
+--- a/src/select.cc
++++ b/src/select.cc
+@@ -145,10 +145,17 @@ value_t select_command(call_scope_t& args)
+       string  thus_far = "";
+ 
+       std::size_t cols = 0;
++#if HAVE_IOCTL
++      struct winsize ws;
++#endif
+       if (report.HANDLED(columns_))
+         cols = lexical_cast<std::size_t>(report.HANDLER(columns_).value);
+       else if (const char * columns_env = std::getenv("COLUMNS"))
+         cols = lexical_cast<std::size_t>(columns_env);
++#if HAVE_IOCTL
++      else if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1)
++          cols = ws.ws_col;
++#endif
+       else
+         cols = 80;
+ 
+diff --git a/src/system.hh.in b/src/system.hh.in
+index eaee14d..67a218d 100644
+--- a/src/system.hh.in
++++ b/src/system.hh.in
+@@ -63,6 +63,7 @@
+ #define HAVE_REALPATH            @HAVE_REALPATH@
+ #define HAVE_GETPWUID            @HAVE_GETPWUID@
+ #define HAVE_GETPWNAM            @HAVE_GETPWNAM@
++#define HAVE_IOCTL               @HAVE_IOCTL@
+ #define HAVE_ISATTY              @HAVE_ISATTY@
+ 
+ #define HAVE_UNIX_PIPES          @HAVE_UNIX_PIPES@
+@@ -151,6 +152,10 @@ typedef std::ostream::pos_type ostream_pos_type;
+ #include <pwd.h>
+ #endif
+ 
++#if HAVE_IOCTL
++#include <sys/ioctl.h>
++#endif
++
+ #if HAVE_UNIX_PIPES
+ #include <sys/types.h>
+ #include <sys/wait.h>
+-- 
+1.9.3
+
