@@ -1,8 +1,10 @@
+%{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
+
 %global commit 720c03b139d251c53f9deef491f5953e2fdb97ca
 
 Name:             ledger
 Version:          3.1
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
@@ -132,19 +134,19 @@ cp -p doc/ledger3.info* %{buildroot}%{_infodir}
 cp -p doc/ledger-mode.info %{buildroot}%{_infodir}
 
 # Contrib scripts
-mkdir -p %{buildroot}%{_docdir}/ledger/contrib
+mkdir -p %{buildroot}%{_pkgdocdir}/contrib
 for i in bal bal-huquq entry getquote.pl getquote-uk.py ledger-du README repl.sh report tc ti to trend; do
-    install -p -m0644 contrib/${i} %{buildroot}%{_docdir}/ledger/contrib/${i}
+    install -p -m0644 contrib/${i} %{buildroot}%{_pkgdocdir}/contrib/${i}
 done
 
 # Python example
-mkdir -p %{buildroot}%{_docdir}/ledger/python
-install -p -m0644 python/demo.py %{buildroot}%{_docdir}/ledger/python/demo.py
+mkdir -p %{buildroot}%{_pkgdocdir}/python
+install -p -m0644 python/demo.py %{buildroot}%{_pkgdocdir}/python/demo.py
 
 # Input samples
-mkdir -p %{buildroot}%{_docdir}/ledger/samples
+mkdir -p %{buildroot}%{_pkgdocdir}/samples
 for i in demo.ledger drewr3.dat drewr.dat sample.dat wow.dat; do
-    install -p -m0644 test/input/${i} %{buildroot}%{_docdir}/ledger/samples/${i}
+    install -p -m0644 test/input/${i} %{buildroot}%{_pkgdocdir}/samples/${i}
 done
 
 
@@ -194,6 +196,9 @@ fi
 
 
 %changelog
+* Tue Dec 23 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.1-2
+- add conditional macro for _pkgdocdir
+
 * Tue Nov 04 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.1-1
 - update to upstream release 3.1
 
