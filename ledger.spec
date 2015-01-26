@@ -4,7 +4,7 @@
 
 Name:             ledger
 Version:          3.1
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
@@ -196,6 +196,9 @@ fi
 
 
 %changelog
+* Mon Jan 26 2015 David Tardon <dtardon@redhat.com> - 3.1-3
+- rebuild for ICU 54.1
+
 * Tue Dec 23 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.1-2
 - add conditional macro for _pkgdocdir
 
