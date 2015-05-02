@@ -4,7 +4,7 @@
 
 Name:             ledger
 Version:          3.1
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 Group:            Applications/Productivity
 License:          BSD
@@ -196,6 +196,9 @@ fi
 
 
 %changelog
+* Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 3.1-5
+- Rebuilt for GCC 5 C++11 ABI change
+
 * Mon Jan 26 2015 Petr Machata <pmachata@redhat.com> - 3.1-4
 - Rebuild for boost 1.57.0
 
