@@ -22,6 +22,8 @@ Patch6:           %{name}-3.1-0006-Fix-numbers-from-example.patch
 Patch7:           %{name}-3.1-0007-Update-ledger3.texi.patch
 Patch8:           %{name}-3.1-0008-Update-ledger3.texi.patch
 Patch9:           %{name}-3.1-0009-Some-minor-changes.patch
+# Fixes build with Boost 1.58.
+Patch10:          https://github.com/ledger/ledger/pull/422.patch
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -97,6 +99,7 @@ emacs-%{name} instead.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 
 %build
@@ -196,7 +199,10 @@ fi
 
 
 %changelog
-* Wed Jul 22 2015 David Tardon <dtardon@redhat.com> - 3.1-7
+* Mon Jul 27 2015 Adam Williamson <awilliam@redhat.com> - 3.1-7
+- add patch from jwakely to fix build with Boost 1.58
+
+* Wed Jul 22 2015 David Tardon <dtardon@redhat.com>
 - rebuild for Boost 1.58
 
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.1-6
