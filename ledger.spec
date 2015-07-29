@@ -22,8 +22,9 @@ Patch6:           %{name}-3.1-0006-Fix-numbers-from-example.patch
 Patch7:           %{name}-3.1-0007-Update-ledger3.texi.patch
 Patch8:           %{name}-3.1-0008-Update-ledger3.texi.patch
 Patch9:           %{name}-3.1-0009-Some-minor-changes.patch
-# Fixes build with Boost 1.58.
-Patch10:          https://github.com/ledger/ledger/pull/422.patch
+# Together, these backports fix build with Boost 1.58
+Patch10:          https://github.com/ledger/ledger/commit/bcaca24de4264f89a94069701361988007e22e58.patch
+Patch11:          https://github.com/ledger/ledger/commit/a1cb25ad2d9a98ea9ec0bb3ee27fe3cde6046434.patch
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -100,6 +101,7 @@ emacs-%{name} instead.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 
 %build
@@ -128,7 +130,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
 install -p -m0644 contrib/ledger-completion.bash \
     %{buildroot}%{_sysconfdir}/bash_completion.d/ledger
 
-# Install documentation manually
+# Install documentation manually to a convenient directory layout
 rm -rf %{buildroot}%{_docdir}
 rm -rf %{buildroot}%{_infodir}/*
 
@@ -175,6 +177,11 @@ fi
 %doc doc/GLOSSARY.md doc/LICENSE doc/NEWS
 %doc doc/ledger3.html doc/ledger-mode.html
 %doc doc/ledger3.pdf  doc/ledger-mode.pdf
+# https://bugzilla.redhat.com/show_bug.cgi?id=728959
+# These must be explicitly listed.
+%doc %{_pkgdocdir}/contrib
+%doc %{_pkgdocdir}/python
+%doc %{_pkgdocdir}/samples
 %{_bindir}/ledger
 %{_infodir}/ledger3.info*
 %{_infodir}/ledger-mode.info*
@@ -200,7 +207,8 @@ fi
 
 %changelog
 * Mon Jul 27 2015 Adam Williamson <awilliam@redhat.com> - 3.1-7
-- add patch from jwakely to fix build with Boost 1.58
+- add patches from jwakely to fix build with Boost 1.58
+- fix pkgdocdir usage
 
 * Wed Jul 22 2015 David Tardon <dtardon@redhat.com>
 - rebuild for Boost 1.58
