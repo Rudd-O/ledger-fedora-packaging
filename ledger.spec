@@ -1,30 +1,12 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
-%global commit 720c03b139d251c53f9deef491f5953e2fdb97ca
-
 Name:             ledger
-Version:          3.1
-Release:          10%{?dist}
+Version:          3.1.1
+Release:          1%{?dist}
 Summary:          A powerful command-line double-entry accounting system
-Group:            Applications/Productivity
 License:          BSD
 URL:              http://ledger-cli.org/
-Source0:          https://github.com/ledger/ledger/archive/%{commit}/%{name}-%{version}.tar.gz
-
-# A series of small commits from upstream that came shortly after the release
-# of version 3.1, including a fix for FTBFS when building the documentation.
-Patch1:           %{name}-3.1-0001-Force-reconcile-to-use-scrubbed-values-incase-you-ar.patch
-Patch2:           %{name}-3.1-0002-Fix-texinfo-syntax-errors.patch
-Patch3:           %{name}-3.1-0003-BUILD_WEB_DOCS-implies-BUILD_DOCS.patch
-Patch4:           %{name}-3.1-0004-make-columns-default-to-terminal-width-as-returned-b.patch
-Patch5:           %{name}-3.1-0005-Typo-fix.patch
-Patch6:           %{name}-3.1-0006-Fix-numbers-from-example.patch
-Patch7:           %{name}-3.1-0007-Update-ledger3.texi.patch
-Patch8:           %{name}-3.1-0008-Update-ledger3.texi.patch
-Patch9:           %{name}-3.1-0009-Some-minor-changes.patch
-# Together, these backports fix build with Boost 1.58
-Patch10:          https://github.com/ledger/ledger/commit/bcaca24de4264f89a94069701361988007e22e58.patch
-Patch11:          https://github.com/ledger/ledger/commit/a1cb25ad2d9a98ea9ec0bb3ee27fe3cde6046434.patch
+Source0:          https://github.com/ledger/ledger/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -59,14 +41,12 @@ their data, there really is no alternative.
 
 %package python
 Summary: Python bindings for %{name}
-Group:   System Environment/Libraries
 Requires: %{name} = %{version}-%{release}
 %description python
 Python bindings for ledger.
 
 %package devel
 Summary: Libraries and header files for %{name} development
-Group:   Development/Libraries
 Requires: %{name} = %{version}-%{release}
 %description devel
 Libraries and header files for %{name} development.
@@ -90,29 +70,24 @@ emacs-%{name} instead.
 
 
 %prep
-%setup -q -n %{name}-%{commit}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
+%setup -qn %{name}-%{version}
+# Avoid texinfo errors on EL7.
+%if 0%{?rhel} == 7
+sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
+%endif
 
 
 %build
 ./acprep --prefix=%{_prefix} update
 %cmake . \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
-    -DBUILD_WEB_DOCS=1 \
-    -DBUILD_EMACSLISP:BOOL=ON \
     -DCMAKE_SKIP_RPATH:BOOL=ON \
-    -DUSE_PYTHON=ON
-make %{?_smp_mflags}
+    -DUSE_PYTHON:BOOL=ON \
+    -DUSE_DOXYGEN:BOOL=ON \
+    -DBUILD_WEB_DOCS:BOOL=ON \
+    -DBUILD_EMACSLISP:BOOL=ON
+#make %%{?_smp_mflags}
+make
 make doc
 
 # Build info files.
@@ -124,6 +99,7 @@ popd
 
 %install
 make install DESTDIR=%{buildroot}
+chmod +x %{buildroot}%{python2_sitearch}/ledger.so
 
 # Bash completion
 mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
@@ -140,7 +116,7 @@ cp -p doc/ledger-mode.info %{buildroot}%{_infodir}
 
 # Contrib scripts
 mkdir -p %{buildroot}%{_pkgdocdir}/contrib
-for i in bal bal-huquq entry getquote.pl getquote-uk.py ledger-du README repl.sh report tc ti to trend; do
+for i in bal bal-huquq entry getquote.pl getquote-uk.py ledger-du ParseCcStmt.cs README repl.sh report tc ti to trend; do
     install -p -m0644 contrib/${i} %{buildroot}%{_pkgdocdir}/contrib/${i}
 done
 
@@ -173,8 +149,7 @@ fi
 
 
 %files
-%doc README.md
-%doc doc/GLOSSARY.md doc/LICENSE doc/NEWS
+%doc README.md doc/GLOSSARY.md doc/NEWS
 %doc doc/ledger3.html doc/ledger-mode.html
 %doc doc/ledger3.pdf  doc/ledger-mode.pdf
 # https://bugzilla.redhat.com/show_bug.cgi?id=728959
@@ -188,6 +163,7 @@ fi
 %{_libdir}/libledger.so.3
 %{_mandir}/man1/ledger.1*
 %config(noreplace) %{_sysconfdir}/bash_completion.d/ledger
+%license LICENSE.md
 
 %files -n emacs-%{name}
 %dir %{_emacs_sitelispdir}/ledger-mode
@@ -206,6 +182,9 @@ fi
 
 
 %changelog
+* Sun Jan 24 2016 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.1.1-1
+- update to upstream release 3.1.1
+
 * Mon Jan 18 2016 Jonathan Wakely <jwakely@redhat.com> - 3.1-10
 - Rebuilt for Boost 1.60
 
