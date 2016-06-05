@@ -78,7 +78,13 @@ sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
 
 
 %build
+# /usr/include/c++/6.1.1/cstdlib:75:25: fatal error: stdlib.h: No such file.
+# Seems to be related to GCC 6.1, potentially fixed with Boost 1.61.
+# Hack around this for now.
+./acprep --prefix=%{_prefix} update || :
+sed -i -e 's# -isystem /usr/include##g' src/CMakeFiles/libledger.dir/build.make
 ./acprep --prefix=%{_prefix} update
+
 %cmake . \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_SKIP_RPATH:BOOL=ON \
@@ -86,6 +92,9 @@ sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
     -DUSE_DOXYGEN:BOOL=ON \
     -DBUILD_WEB_DOCS:BOOL=ON \
     -DBUILD_EMACSLISP:BOOL=ON
+
+sed -i -e 's# -isystem /usr/include##g' src/CMakeFiles/libledger.dir/build.make
+mkdir system.hh.gch
 #make %%{?_smp_mflags}
 make
 make doc
