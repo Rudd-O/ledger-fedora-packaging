@@ -2,11 +2,14 @@
 
 Name:             ledger
 Version:          3.1.1
-Release:          7%{?dist}
+Release:          8%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
 Source0:          https://github.com/ledger/ledger/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+# https://github.com/ledger/ledger/pull/465
+Patch0:           ledger-3.1.1-fix-boost-1.61.patch
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -71,6 +74,7 @@ emacs-%{name} instead.
 
 %prep
 %setup -qn %{name}-%{version}
+%patch0 -p1
 # Avoid texinfo errors on EL7.
 %if 0%{?rhel} == 7
 sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
@@ -191,6 +195,9 @@ fi
 
 
 %changelog
+* Wed Jul 26 2017 Iliana Weller <ilianaw@buttslol.net> - 3.1.1-8
+- Apply patch to fix builds on boost 1.61+ (#1423835)
+
 * Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.1-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
