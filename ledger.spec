@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.1.1
-Release:          10%{?dist}
+Release:          11%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
@@ -42,10 +42,14 @@ from the UNIX command-line. This may put off some users — as there is
 no flashy UI — but for those who want unparalleled reporting access to
 their data, there really is no alternative.
 
-%package python
+%package -n python2-ledger
+%{?python_provide:%python_provide python2-ledger}
+# Remove before F30
+Provides: %{name}-python%{?_isa} = %{version}-%{release}
+Obsoletes: %{name}-python < %{version}-%{release}
 Summary: Python bindings for %{name}
 Requires: %{name} = %{version}-%{release}
-%description python
+%description -n python2-ledger
 Python bindings for ledger.
 
 %package devel
@@ -186,7 +190,7 @@ fi
 %dir %{_emacs_sitelispdir}/ledger-mode
 %{_emacs_sitelispdir}/ledger-mode/*.el
 
-%files python
+%files -n python2-ledger
 %{python2_sitearch}/ledger.so
 
 %files devel
@@ -195,6 +199,10 @@ fi
 
 
 %changelog
+* Sat Aug 19 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.1.1-11
+- Python 2 binary package renamed to python2-ledger
+  See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
+
 * Thu Aug 10 2017 Iliana Weller <ilianaw@buttslol.net> - 3.1.1-10
 - Rebuilt after F27 rebuild stabilization
 
