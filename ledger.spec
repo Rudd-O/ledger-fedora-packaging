@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.1.1
-Release:          17%{?dist}
+Release:          18%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
@@ -201,6 +201,9 @@ fi
 
 
 %changelog
+* Wed May 02 2018 Pete Walter <pwalter@fedoraproject.org> - 3.1.1-18
+- Rebuild for ICU 61.1
+
 * Tue May 01 2018 Jonathan Wakely <jwakely@redhat.com> - 3.1.1-17
 - Add BuildRequires: boost-python2-devel to fix build with boost-1.66.0-7.fc29
 
