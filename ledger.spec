@@ -15,6 +15,8 @@ BuildRequires:    boost-devel
 BuildRequires:    boost-python2-devel
 BuildRequires:    cmake
 BuildRequires:    emacs(bin)
+BuildRequires:    gcc
+BuildRequires:    gcc-c++
 BuildRequires:    gettext-devel
 BuildRequires:    gmp-devel
 BuildRequires:    libedit-devel
