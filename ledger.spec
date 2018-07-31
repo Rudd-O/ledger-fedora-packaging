@@ -21,6 +21,7 @@ BuildRequires:    libedit-devel
 BuildRequires:    mpfr-devel
 BuildRequires:    python2-devel
 BuildRequires:    utf8cpp-devel
+BuildRequires:    /usr/bin/python
 
 # For building documentation.
 BuildRequires:    doxygen
