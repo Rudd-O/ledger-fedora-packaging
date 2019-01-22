@@ -35,11 +35,6 @@ BuildRequires:    texlive-ec
 BuildRequires:    texlive-eurosym
 BuildRequires:    texinfo-tex
 
-Requires(post):   /sbin/ldconfig
-Requires(postun): /sbin/ldconfig
-Requires(post):   info
-Requires(preun):  info
-
 %description
 Ledger is a powerful, double-entry accounting system that is accessed
 from the UNIX command-line. This may put off some users — as there is
@@ -156,19 +151,6 @@ done
 %check
 # Tests all fail when removing rpath.
 # make check
-
-
-%postun -p /sbin/ldconfig
-%post
-/sbin/ldconfig
-install-info %{_infodir}/ledger3.info %{_infodir}/dir || :
-install-info %{_infodir}/ledger-mode.info %{_infodir}/dir || :
-%preun
-if [ $1 = 0 ]; then
-  install-info --delete %{_infodir}/ledger3.info %{_infodir}/dir || :
-  install-info --delete %{_infodir}/ledger-mode.info %{_infodir}/dir || :
-fi
-
 
 %files
 %doc README.md doc/GLOSSARY.md doc/NEWS
