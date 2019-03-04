@@ -1,0 +1,25 @@
+From 9af52328b8ee1aeafbe6b4ad43c3a9cc2cb8be5b Mon Sep 17 00:00:00 2001
+From: Jamie Nguyen <j@jamielinux.com>
+Date: Mon, 4 Mar 2019 16:08:09 +0000
+Subject: [PATCH] Amend sha1.hpp path
+
+---
+ src/utils.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils.h b/src/utils.h
+index 42ea2ae..70a8ea6 100644
+--- a/src/utils.h
++++ b/src/utils.h
+@@ -44,7 +44,7 @@
+ #ifndef _UTILS_H
+ #define _UTILS_H
+ 
+-#include <boost/uuid/sha1.hpp>
++#include <boost/uuid/detail/sha1.hpp>
+ 
+ /**
+  * @name Default values
+-- 
+2.20.1
+
