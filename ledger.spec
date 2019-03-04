@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.1.1
-Release:          21%{?dist}
+Release:          22%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
@@ -21,9 +21,7 @@ BuildRequires:    gettext-devel
 BuildRequires:    gmp-devel
 BuildRequires:    libedit-devel
 BuildRequires:    mpfr-devel
-BuildRequires:    python2-devel
 BuildRequires:    utf8cpp-devel
-BuildRequires:    /usr/bin/python
 
 # For building documentation.
 BuildRequires:    doxygen
@@ -35,22 +33,14 @@ BuildRequires:    texlive-ec
 BuildRequires:    texlive-eurosym
 BuildRequires:    texinfo-tex
 
+# Obsolete the python2-ledger subpackage rhbz#1629493
+Obsoletes:        python2-ledger < 3.1.1-22
+
 %description
 Ledger is a powerful, double-entry accounting system that is accessed
 from the UNIX command-line. This may put off some users — as there is
 no flashy UI — but for those who want unparalleled reporting access to
 their data, there really is no alternative.
-
-%package -n python2-ledger
-%{?python_provide:%python_provide python2-ledger}
-# Remove before F30
-Provides: %{name}-python = %{version}-%{release}
-Provides: %{name}-python%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-python < %{version}-%{release}
-Summary: Python bindings for %{name}
-Requires: %{name} = %{version}-%{release}
-%description -n python2-ledger
-Python bindings for ledger.
 
 %package devel
 Summary: Libraries and header files for %{name} development
@@ -79,6 +69,7 @@ emacs-%{name} instead.
 %prep
 %setup -qn %{name}-%{version}
 %patch0 -p1
+%patch1 -p1
 # Avoid texinfo errors on EL7.
 %if 0%{?rhel} == 7
 sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
@@ -96,7 +87,7 @@ sed -i -e 's# -isystem /usr/include##g' src/CMakeFiles/libledger.dir/build.make
 %cmake . \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_SKIP_RPATH:BOOL=ON \
-    -DUSE_PYTHON:BOOL=ON \
+    -DUSE_PYTHON:BOOL=OFF \
     -DUSE_DOXYGEN:BOOL=ON \
     -DBUILD_WEB_DOCS:BOOL=ON \
     -DBUILD_EMACSLISP:BOOL=ON
@@ -116,7 +107,6 @@ popd
 
 %install
 make install DESTDIR=%{buildroot}
-chmod +x %{buildroot}%{python2_sitearch}/ledger.so
 
 # Bash completion
 mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
@@ -137,10 +127,6 @@ for i in bal bal-huquq entry getquote.pl getquote-uk.py ledger-du ParseCcStmt.cs
     install -p -m0644 contrib/${i} %{buildroot}%{_pkgdocdir}/contrib/${i}
 done
 
-# Python example
-mkdir -p %{buildroot}%{_pkgdocdir}/python
-install -p -m0644 python/demo.py %{buildroot}%{_pkgdocdir}/python/demo.py
-
 # Input samples
 mkdir -p %{buildroot}%{_pkgdocdir}/samples
 for i in demo.ledger drewr3.dat drewr.dat sample.dat wow.dat; do
@@ -159,7 +145,6 @@ done
 # https://bugzilla.redhat.com/show_bug.cgi?id=728959
 # These must be explicitly listed.
 %doc %{_pkgdocdir}/contrib
-%doc %{_pkgdocdir}/python
 %doc %{_pkgdocdir}/samples
 %{_bindir}/ledger
 %{_infodir}/ledger3.info*
@@ -177,15 +162,15 @@ done
 %dir %{_emacs_sitelispdir}/ledger-mode
 %{_emacs_sitelispdir}/ledger-mode/*.el
 
-%files -n python2-ledger
-%{python2_sitearch}/ledger.so
-
 %files devel
 %{_includedir}/ledger
 %{_libdir}/libledger.so
 
 
 %changelog
+* Mon Mar 04 2019 Jamie Nguyen <jamielinux@fedoraproject.org> - 3.1.1-22
+- Obsolete the python2-ledger subpackage rhbz#1629493
+
 * Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.1-21
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
