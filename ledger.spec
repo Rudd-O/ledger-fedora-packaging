@@ -1,21 +1,19 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
+%global commit 49b07a1c19489547b859d61fbc5c240aff224dda
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
 Name:             ledger
-Version:          3.1.1
-Release:          24%{?dist}
+Version:          3.1.3
+Release:          1.20191025git49b07a1%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
-Source0:          https://github.com/ledger/ledger/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-# https://github.com/ledger/ledger/pull/465
-Patch0:           ledger-3.1.1-fix-boost-1.61.patch
-Patch1:           ledger-3.1.1-Amend-sha1.hpp-path.patch
+Source0:          https://github.com/ledger/ledger/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 
 BuildRequires:    boost-devel
 BuildRequires:    boost-python2-devel
 BuildRequires:    cmake
-BuildRequires:    emacs(bin)
 BuildRequires:    gcc
 BuildRequires:    gcc-c++
 BuildRequires:    gettext-devel
@@ -49,55 +47,34 @@ Requires: %{name} = %{version}-%{release}
 %description devel
 Libraries and header files for %{name} development.
 
-%package -n emacs-%{name}
-Summary: Emacs mode for %{name}
-Requires: %{name} = %{version}-%{release}
-Requires: emacs(bin) >= %{_emacs_version}
-%description -n emacs-%{name}
-Emacs mode for %{name}.
-
-%package -n emacs-%{name}-el
-Summary: Emacs elisp source for %{name}
-BuildArch: noarch
-Requires: %{name} = %{version}-%{release}
-Requires: emacs-%{name} = %{version}-%{release}
-%description -n emacs-%{name}-el
-This package contains the elisp source files for using %{name} under
-emacs. You do not need to install this package; use
-emacs-%{name} instead.
-
-
 %prep
-%setup -qn %{name}-%{version}
-%patch0 -p1
-%patch1 -p1
+%autosetup -n %{name}-%{commit}
 # Avoid texinfo errors on EL7.
 %if 0%{?rhel} == 7
 sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
 %endif
+rm -r lib/utfcpp
 
 
 %build
 %cmake . \
-    -DCMAKE_INSTALL_PREFIX=%{_prefix} \
-    -DCMAKE_SKIP_RPATH:BOOL=ON \
-    -DUSE_PYTHON:BOOL=OFF \
-    -DUSE_DOXYGEN:BOOL=ON \
-    -DBUILD_WEB_DOCS:BOOL=ON \
-    -DBUILD_EMACSLISP:BOOL=ON
+       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+       -DCMAKE_SKIP_RPATH:BOOL=ON \
+       -DUSE_PYTHON:BOOL=OFF \
+       -DUSE_DOXYGEN:BOOL=ON \
+       -DBUILD_WEB_DOCS:BOOL=ON
 
-make
-make doc
+%make_build
+%__make doc
 
 # Build info files.
 pushd doc
 makeinfo ledger3.texi
-makeinfo ledger-mode.texi
 popd
 
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 # Bash completion
 mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
@@ -110,7 +87,6 @@ rm -rf %{buildroot}%{_infodir}/*
 
 # Info files
 cp -p doc/ledger3.info* %{buildroot}%{_infodir}
-cp -p doc/ledger-mode.info %{buildroot}%{_infodir}
 
 # Contrib scripts
 mkdir -p %{buildroot}%{_pkgdocdir}/contrib
@@ -124,34 +100,24 @@ for i in demo.ledger drewr3.dat drewr.dat sample.dat wow.dat; do
     install -p -m0644 test/input/${i} %{buildroot}%{_pkgdocdir}/samples/${i}
 done
 
-
 %check
 # Tests all fail when removing rpath.
-# make check
+LD_LIBRARY_PATH=$PWD %__make check
 
 %files
-%doc README.md doc/GLOSSARY.md doc/NEWS
-%doc doc/ledger3.html doc/ledger-mode.html
-%doc doc/ledger3.pdf  doc/ledger-mode.pdf
+%doc README.md doc/GLOSSARY.md doc/NEWS.md
+%doc doc/ledger3.html
+%doc doc/ledger3.pdf
 # https://bugzilla.redhat.com/show_bug.cgi?id=728959
 # These must be explicitly listed.
 %doc %{_pkgdocdir}/contrib
 %doc %{_pkgdocdir}/samples
 %{_bindir}/ledger
 %{_infodir}/ledger3.info*
-%{_infodir}/ledger-mode.info*
 %{_libdir}/libledger.so.3
 %{_mandir}/man1/ledger.1*
 %config(noreplace) %{_sysconfdir}/bash_completion.d/ledger
 %license LICENSE.md
-
-%files -n emacs-%{name}
-%dir %{_emacs_sitelispdir}/ledger-mode
-%{_emacs_sitelispdir}/ledger-mode/*.elc
-
-%files -n emacs-%{name}-el
-%dir %{_emacs_sitelispdir}/ledger-mode
-%{_emacs_sitelispdir}/ledger-mode/*.el
 
 %files devel
 %{_includedir}/ledger
@@ -159,6 +125,11 @@ done
 
 
 %changelog
+* Fri Oct 25 2019 Jani Juhani Sinervo <jani@sinervo.fi> - 3.1.3-1.20191025git49b07a1
+- Update to version 3.1.3
+- emacs-ledger and emacs-ledger-el have been separated from the main tree
+- Enable tests
+
 * Wed Oct  9 2019 Jerry James <loganjerry@gmail.com> - 3.1.1-24
 - Rebuild for mpfr 4
 
