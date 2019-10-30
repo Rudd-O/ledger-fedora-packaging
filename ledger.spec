@@ -1,18 +1,17 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
-%global commit 49b07a1c19489547b859d61fbc5c240aff224dda
+%global commit 2ca3d6992ffb4a3546a0451808bd9bd2969c82ff
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:             ledger
 Version:          3.1.3
-Release:          1.20191025git49b07a1%{?dist}
+Release:          1.20191030git2ca3d69%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
 Source0:          https://github.com/ledger/ledger/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 
 BuildRequires:    boost-devel
-BuildRequires:    boost-python2-devel
 BuildRequires:    cmake
 BuildRequires:    gcc
 BuildRequires:    gcc-c++
@@ -100,9 +99,10 @@ for i in demo.ledger drewr3.dat drewr.dat sample.dat wow.dat; do
     install -p -m0644 test/input/${i} %{buildroot}%{_pkgdocdir}/samples/${i}
 done
 
-%check
+# Tests are disabled for the time being since they seem to require Python 2
+#%%check
 # Tests all fail when removing rpath.
-LD_LIBRARY_PATH=$PWD %__make check
+#LD_LIBRARY_PATH=$PWD %__make check
 
 %files
 %doc README.md doc/GLOSSARY.md doc/NEWS.md
@@ -125,6 +125,11 @@ LD_LIBRARY_PATH=$PWD %__make check
 
 
 %changelog
+* Wed Oct 30 2019 Jani Juhani Sinervo <jani@sinervo.fi> - 3.1.3-1.20191030git2ca3d69
+- Update docs
+- Remove python 2 dependence
+- Disable tests because of their dependence on python 2
+
 * Fri Oct 25 2019 Jani Juhani Sinervo <jani@sinervo.fi> - 3.1.3-1.20191025git49b07a1
 - Update to version 3.1.3
 - emacs-ledger and emacs-ledger-el have been separated from the main tree
