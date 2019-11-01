@@ -5,7 +5,7 @@
 
 Name:             ledger
 Version:          3.1.3
-Release:          1.20191030git2ca3d69%{?dist}
+Release:          2.20191030git2ca3d69%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
@@ -125,6 +125,9 @@ done
 
 
 %changelog
+* Fri Nov 01 2019 Pete Walter <pwalter@fedoraproject.org> - 3.1.3-2.20191030git2ca3d69
+- Rebuild for ICU 65
+
 * Wed Oct 30 2019 Jani Juhani Sinervo <jani@sinervo.fi> - 3.1.3-1.20191030git2ca3d69
 - Update docs
 - Remove python 2 dependence
