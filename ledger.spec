@@ -1,15 +1,12 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
-%global commit 2ca3d6992ffb4a3546a0451808bd9bd2969c82ff
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
 Name:             ledger
-Version:          3.1.3
-Release:          6.20191030git2ca3d69%{?dist}
+Version:          3.2.1
+Release:          1%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
-Source0:          https://github.com/ledger/ledger/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
+Source0:          https://github.com/ledger/ledger/archive/v%{version}.tar.gz
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -47,7 +44,7 @@ Requires: %{name} = %{version}-%{release}
 Libraries and header files for %{name} development.
 
 %prep
-%autosetup -n %{name}-%{commit}
+%autosetup -n %{name}-%{version}
 # Avoid texinfo errors on EL7.
 %if 0%{?rhel} == 7
 sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
@@ -63,17 +60,11 @@ rm -r lib/utfcpp
        -DUSE_DOXYGEN:BOOL=ON \
        -DBUILD_WEB_DOCS:BOOL=ON
 
-%make_build
-%__make doc
-
-# Build info files.
-pushd doc
-makeinfo ledger3.texi
-popd
-
+%cmake_build
+%cmake_build -t doc
 
 %install
-%make_install
+%cmake_install
 
 # Bash completion
 mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d
@@ -85,29 +76,29 @@ rm -rf %{buildroot}%{_docdir}
 rm -rf %{buildroot}%{_infodir}/*
 
 # Info files
-cp -p doc/ledger3.info* %{buildroot}%{_infodir}
+cp -p %{__cmake_builddir}/doc/ledger3.info* %{buildroot}%{_infodir}
 
 # Contrib scripts
 mkdir -p %{buildroot}%{_pkgdocdir}/contrib
-for i in bal bal-huquq entry getquote.pl getquote-uk.py ledger-du ParseCcStmt.cs README repl.sh report tc ti to trend; do
+for i in bal bal-huquq compilation-ledger.el entry getquote.pl getquote-uk.py ledger-du README repl.sh report tc ti to trend; do
     install -p -m0644 contrib/${i} %{buildroot}%{_pkgdocdir}/contrib/${i}
 done
 
 # Input samples
 mkdir -p %{buildroot}%{_pkgdocdir}/samples
-for i in demo.ledger drewr3.dat drewr.dat sample.dat wow.dat; do
+for i in demo.ledger divzero.dat drewr3.dat drewr.dat sample.dat standard.dat transfer.dat wow.dat; do
     install -p -m0644 test/input/${i} %{buildroot}%{_pkgdocdir}/samples/${i}
 done
 
 # Tests are disabled for the time being since they seem to require Python 2
 #%%check
 # Tests all fail when removing rpath.
-#LD_LIBRARY_PATH=$PWD %__make check
+#LD_LIBRARY_PATH=$PWD %%ctest
 
 %files
 %doc README.md doc/GLOSSARY.md doc/NEWS.md
-%doc doc/ledger3.html
-%doc doc/ledger3.pdf
+%doc %{__cmake_builddir}/doc/ledger3.html
+%doc %{__cmake_builddir}/doc/ledger3.pdf
 # https://bugzilla.redhat.com/show_bug.cgi?id=728959
 # These must be explicitly listed.
 %doc %{_pkgdocdir}/contrib
@@ -125,6 +116,10 @@ done
 
 
 %changelog
+* Sat Aug 01 2020 Jani Juhani Sinervo <jani@sinervo.fi> - 3.2.1-1
+- Update to newest stable upstream version
+- Fix build on Rawhide
+
 * Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.3-6.20191030git2ca3d69
 - Second attempt - Rebuilt for
   https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
