@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.2.1
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
@@ -116,6 +116,9 @@ done
 
 
 %changelog
+* Fri Jan 22 2021 Jonathan Wakely <jwakely@redhat.com> - 3.2.1-2
+- Rebuilt for Boost 1.75
+
 * Sat Aug 01 2020 Jani Juhani Sinervo <jani@sinervo.fi> - 3.2.1-1
 - Update to newest stable upstream version
 - Fix build on Rawhide
