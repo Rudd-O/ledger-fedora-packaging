@@ -2,7 +2,7 @@
 
 Name:             ledger
 Version:          3.2.1
-Release:          4%{?dist}
+Release:          5%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
@@ -116,6 +116,9 @@ done
 
 
 %changelog
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
 * Thu May 20 2021 Pete Walter <pwalter@fedoraproject.org> - 3.2.1-4
 - Rebuild for ICU 69
 
