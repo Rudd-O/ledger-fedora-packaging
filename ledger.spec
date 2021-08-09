@@ -2,11 +2,13 @@
 
 Name:             ledger
 Version:          3.2.1
-Release:          6%{?dist}
+Release:          7%{?dist}
 Summary:          A powerful command-line double-entry accounting system
 License:          BSD
 URL:              http://ledger-cli.org/
 Source0:          https://github.com/ledger/ledger/archive/v%{version}.tar.gz
+# https://github.com/ledger/ledger/pull/2036
+Patch0:           ledger-boost176.patch
 
 BuildRequires:    boost-devel
 BuildRequires:    cmake
@@ -44,7 +46,7 @@ Requires: %{name} = %{version}-%{release}
 Libraries and header files for %{name} development.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{name}-%{version} -p 1
 # Avoid texinfo errors on EL7.
 %if 0%{?rhel} == 7
 sed -i -e 's#FIXME:UNDOCUMENTED#FIXMEUNDOCUMENTED#g' doc/ledger3.texi
@@ -116,8 +118,8 @@ done
 
 
 %changelog
-* Fri Aug 06 2021 Jonathan Wakely <jwakely@redhat.com> - 3.2.1-6
-- Rebuilt for Boost 1.76
+* Mon Aug 09 2021 Jonathan Wakely <jwakely@redhat.com> - 3.2.1-7
+- Patched and rebuilt for Boost 1.76
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
