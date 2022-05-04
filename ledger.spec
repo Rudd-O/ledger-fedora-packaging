@@ -55,7 +55,7 @@ rm -r lib/utfcpp
 
 
 %build
-%cmake . \
+%cmake \
        -DCMAKE_INSTALL_PREFIX=%{_prefix} \
        -DCMAKE_SKIP_RPATH:BOOL=ON \
        -DUSE_PYTHON:BOOL=OFF \
